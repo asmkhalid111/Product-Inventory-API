@@ -67,10 +67,19 @@ public class ProductService {
         Product existingProduct = repository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product Not found " + id));
 
+
+        if(!existingProduct.getSku().equals(product.getSku())) {
+            throw new InvalidSkuFormatException("SKU Can't BE changed");
+        }
+
+
         existingProduct.setName(product.getName());
         existingProduct.setPrice(product.getPrice());
         existingProduct.setQuantity(product.getQuantity());
-        existingProduct.setSku(product.getSku());
+        existingProduct.setDescription(product.getDescription()); // Added update Description
+//        existingProduct.setSku(product.getSku()); I can't update SKU
+
+
         return repository.save(existingProduct);
 
     }
