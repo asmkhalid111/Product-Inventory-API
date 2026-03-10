@@ -2,6 +2,7 @@ package com.asmkhalid101.productinventoryapi.service;
 
 
 import com.asmkhalid101.productinventoryapi.entity.Product;
+import com.asmkhalid101.productinventoryapi.exception.ProductNotFoundException;
 import com.asmkhalid101.productinventoryapi.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,9 @@ import java.util.List;
 
 public class ProductService {
     private final ProductRepository repository;
+
+
+    private static final String SKU_PATTERN = "^SKU-[A-Za-z0-9]{8}$";
 
 
     // Creating New Product
@@ -31,14 +35,14 @@ public class ProductService {
 
     public Product getProductById(long id){
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product Not found"));
+                .orElseThrow(() -> new ProductNotFoundException("Product Not found " + id));
     }
 
     // Update Product
 
     public Product updateProduct(Long id, Product product) {
         Product existingProduct = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product Not found"));
+                .orElseThrow(() -> new ProductNotFoundException("Product Not found " + id));
 
         existingProduct.setName(product.getName());
         existingProduct.setPrice(product.getPrice());
@@ -53,7 +57,7 @@ public class ProductService {
 
     public void deleteProduct(Long id) {
         Product existingProduct = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product Not found"));
+                .orElseThrow(() -> new ProductNotFoundException("Product Not found " + id));
 
         repository.delete(existingProduct);
     }
