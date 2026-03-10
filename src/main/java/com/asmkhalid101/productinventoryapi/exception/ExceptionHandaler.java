@@ -41,4 +41,12 @@ public class ExceptionHandaler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
 
+    // Handling Bean Validation
+
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public ResponseEntity<ExceptionResponse> handleValidationException(org.springframework.web.bind.MethodArgumentNotValidException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ExceptionResponse("Validation failed", HttpStatus.BAD_REQUEST.value()));
+    }
+
 }

@@ -3,7 +3,10 @@ package com.asmkhalid101.productinventoryapi.controller;
 
 import com.asmkhalid101.productinventoryapi.entity.Product;
 import com.asmkhalid101.productinventoryapi.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -16,29 +19,40 @@ import java.util.List;
 
 public class ProductController {
 
+    // Added valid annotation that i forgot to add.
+
     private final ProductService service;
+
+    private final Logger log = LoggerFactory.getLogger(ProductController.class);
 
     // Get All
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts(long id) {
-
-        return ResponseEntity.ok(service.getAllProducts());
+    public ResponseEntity<List<Product>> getAllProducts() {
+        log.debug("Received request to fetch all products");
+        List<Product> products = service.getAllProducts();
+        log.info("Fetched {} products", products.size());
+        return ResponseEntity.ok(products);
     }
-
 
     // Getting By id
 
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable long id) {
-        return ResponseEntity.ok(service.getProductById(id));
+        log.debug("Received request to fetch product with ID: {}", id);
+        Product product = service.getProductById(id);
+        log.info("Fetched product with ID: {}", id);
+        return ResponseEntity.ok(product);
     }
 
-    // Creating Employee
+    // Creating Product
 
     @PostMapping
-    public  ResponseEntity<Product> createProduct(@RequestBody Product product){
-        return ResponseEntity.ok(service.createProduct(product));
+    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product){
+        log.debug("Received request to create product: {}", product);
+        Product savedProduct = service.createProduct(product);
+        log.info("Product created with ID: {} and SKU: {}", savedProduct.getId(), savedProduct.getSku());
+        return ResponseEntity.ok(savedProduct);
     }
 
 
@@ -46,9 +60,11 @@ public class ProductController {
     // Updating by the id
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product product){
-
-        return ResponseEntity.ok(service.updateProduct(id, product));
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @Valid @RequestBody Product product){
+        log.debug("Received request to update product with ID: {}", id);
+        Product updatedProduct = service.updateProduct(id, product);
+        log.info("Product updated with ID: {} and SKU: {}", updatedProduct.getId(), updatedProduct.getSku());
+        return ResponseEntity.ok(updatedProduct);
     }
 
 
@@ -56,8 +72,10 @@ public class ProductController {
     // Deleting By id
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Product> deleteProduct (@PathVariable long id){
+    public ResponseEntity<Void> deleteProduct (@PathVariable long id){
+        log.debug("Received request to delete product with ID: {}", id);
         service.deleteProduct(id);
+        log.info("Product deleted with ID: {}", id);
         return ResponseEntity.noContent().build();
     }
 
